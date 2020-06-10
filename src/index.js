@@ -1,14 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
+    let saveDog = {
+        dogId: null
+    }
+
     const dogURL = "http://localhost:3000/dogs"
     const tableBody = document.getElementById("table-body")
     const dogForm = document.getElementById('dog-form')
     console.log(dogForm)
 
 
-    fetch(dogURL)
-    .then(resp => resp.json())
-    .then(allDogs => renderDogs(allDogs))
+    function getDogInfo(){
+        fetch(dogURL)
+        .then(resp => resp.json())
+        .then(allDogs => renderDogs(allDogs))
+    }
+
+    getDogInfo()
 
     function renderDogs(allDogs) {
         allDogs.forEach(dog => renderDog(dog))
@@ -34,15 +42,41 @@ document.addEventListener('DOMContentLoaded', () => {
             dogForm.name.value = getName
             dogForm.breed.value = getBreed
             dogForm.sex.value = getSex
+
+            saveDog.dogId = e.target.getAttribute('data-dog-id')
             
         }//end of if (edit)
         if (e.target.value === 'Submit') {
-
-            //on submit --- patch request the new form values! 
             e.preventDefault()
-
+            const id = saveDog.dogId
+            const updatedDogObj = {
+                name: dogForm.name.value,
+                breed: dogForm.breed.value,
+                sex: dogForm.sex.value
+            }
+            fetch(`http://localhost:3000/dogs/${id}`, {
+                method: "PATCH", 
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(updatedDogObj)
+            })
+            .then(resp => resp.json())
+            .then(console.log)
+            
+            // (data => updateDogRow(data))
+            
+            //new get request for all the dogs + updated dog and render again
+                //AFTER the patch 
 
         }//end of if (submit)
+
+        // function updateDogRow(dog) {
+
+        // }
+
+
     })//end of eventlistener 
 
 })//end of DOMLOAD

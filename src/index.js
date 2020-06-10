@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dogURL = "http://localhost:3000/dogs"
     const tableBody = document.getElementById("table-body")
     const dogForm = document.getElementById('dog-form')
-    console.log(dogForm)
 
 
     function getDogInfo(){
@@ -24,11 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderDog(dog) {
         tableBody.innerHTML += 
-        `<tr>
+        `<tr data-dog-id="${dog.id}">
             <td>${dog.name}</td> 
             <td>${dog.breed}</td> 
             <td>${dog.sex}</td> 
-            <td><button data-dog-id="${dog.id}">Edit</button></td>
+            <td><button class="edit" data-dog-id="${dog.id}">Edit</button></td>
         </tr>`
     }
     
@@ -63,20 +62,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(updatedDogObj)
             })
             .then(resp => resp.json())
-            .then(console.log)
-            
-            // (data => updateDogRow(data))
-            
-            //new get request for all the dogs + updated dog and render again
-                //AFTER the patch 
+            .then(newDogData => updateDogRow(newDogData))
 
         }//end of if (submit)
-
-        // function updateDogRow(dog) {
-
-        // }
-
-
     })//end of eventlistener 
+
+
+     function updateDogRow(newDogData) {
+            const dogId = newDogData.id
+            const dogTableRow = document.getElementsByTagName('tr')
+            const makeDogTableRowArray = Array.from(dogTableRow)
+            makeDogTableRowArray.forEach(row => {
+                const parsedrow = parseInt(row.dataset.dogId)
+                if (parsedrow === dogId){
+                    row.innerHTML = 
+                    `<td>${newDogData.name}</td> 
+                    <td>${newDogData.breed}</td> 
+                    <td>${newDogData.sex}</td> 
+                    <td><button class="edit" data-dog-id="${newDogData.id}">Edit</button></td>
+                    `
+                }
+            })
+
+        }
 
 })//end of DOMLOAD
